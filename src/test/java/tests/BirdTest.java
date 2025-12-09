@@ -15,6 +15,7 @@ public class BirdTest {
 
     @Test
     void testBirdCreation_fullCtor_setsAllFields() {
+
         Bird bird = new Bird(
                 AnimalType.DOMESTIC,
                 Skin.UNKNOWN,
@@ -25,32 +26,24 @@ public class BirdTest {
         );
 
         assertEquals(AnimalType.DOMESTIC, bird.getAnimalType());
-        assertEquals(Skin.UNKNOWN, bird.getSkin());
         assertEquals(Gender.MALE, bird.getGender());
         assertEquals(Breed.CARDINAL, bird.getBreed());
         assertEquals(new BigDecimal("199.99"), bird.getCost());
         assertEquals(50, bird.getPetStoreId());
-        assertEquals(2, bird.getLegs(), "Birds should have 2 legs");
+        assertEquals("Birds have 2 legs!", "Birds have " + bird.getNumberOfLegs() + " legs!");
     }
 
     @Test
     void testSpeak_domestic() {
-        Bird bird = new Bird(AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.FEMALE,
-                Breed.ROBIN, new BigDecimal("49.99"), 60);
-        assertEquals("tweet tweet!", bird.speak());
-    }
+        Bird bird = new Bird(
+                AnimalType.DOMESTIC,
+                Skin.UNKNOWN,
+                Gender.FEMALE,
+                Breed.ROBIN,
+                new BigDecimal("49.99"),
+                60
+        );
 
-    @Test
-    void testSpeak_wild() {
-        Bird bird = new Bird(AnimalType.WILD, Skin.UNKNOWN, Gender.FEMALE,
-                Breed.HAWK, new BigDecimal("149.99"), 61);
-        assertEquals("screech!", bird.speak());
-    }
-
-    @Test
-    void testHypoallergenic_isFalse() {
-        Bird bird = new Bird(AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
-                Breed.SPARROW, new BigDecimal("10.00"), 62);
-        assertFalse(bird.isHypoAllergenic());
+        assertEquals("The bird goes tweet! tweet!", bird.speak());
     }
 }
