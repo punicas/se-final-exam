@@ -6,6 +6,7 @@ import animals.petstore.pet.attributes.Gender;
 import animals.petstore.pet.attributes.Skin;
 import animals.petstore.pet.types.Cat;
 import animals.petstore.pet.types.Dog;
+import animals.petstore.pet.types.Bird;   // <-- ADDED IMPORT
 import animals.petstore.store.DuplicatePetStoreRecordException;
 import animals.petstore.store.PetNotFoundSaleException;
 import animals.petstore.store.PetStore;
@@ -56,7 +57,6 @@ public class PetStoreTest
         Dog poodle = new Dog(AnimalType.DOMESTIC, Skin.FUR, Gender.MALE, Breed.POODLE,
                 new BigDecimal("650.00"), 1);
 
-        // Validation
         petStore.soldPetItem(poodle);
         assertEquals(inventorySize, petStore.getPetsForSale().size(), "Expected inventory does not match actual");
     }
@@ -69,12 +69,10 @@ public class PetStoreTest
         Dog poodle = new Dog(AnimalType.DOMESTIC, Skin.FUR, Gender.MALE, Breed.POODLE,
                 new BigDecimal("650.00"), 1);
 
-        // Validation
         String expectedMessage = "Duplicate Dog record store id [1]";
         Exception exception = assertThrows(DuplicatePetStoreRecordException.class, () ->{
             petStore.soldPetItem(poodle);});
         assertEquals(expectedMessage, exception.getMessage(), "DuplicateRecordExceptionTest was NOT encountered!");
-
     }
 
     @Test
@@ -86,17 +84,10 @@ public class PetStoreTest
                 new BigDecimal("100.00"),2);
         Cat removedItem = (Cat) petStore.soldPetItem(sphynx);
 
-        // Validation
         assertEquals(inventorySize, petStore.getPetsForSale().size(), "Expected inventory does not match actual");
         assertEquals(sphynx.getPetStoreId(), removedItem.getPetStoreId(), "The cat items are identical");
     }
 
-    /**
-     * Limitations to test factory as it does not instantiate before all
-     * @return list of {@link DynamicNode} that contains the test results
-     * @throws DuplicatePetStoreRecordException if duplicate pet record is found
-     * @throws PetNotFoundSaleException if pet is not found
-     */
     @TestFactory
     @DisplayName("Sale of Sphynx Remove Item Test2")
     public Stream<DynamicNode> sphynxSoldTest2() throws DuplicatePetStoreRecordException, PetNotFoundSaleException {
@@ -106,70 +97,70 @@ public class PetStoreTest
                 new BigDecimal("100.00"),2);
         Cat removedItem = (Cat) petStore.soldPetItem(sphynx);
 
-        // Validation
         List<DynamicNode> nodes = new ArrayList<>();
         List<DynamicTest> dynamicTests = Arrays.asList(
                 dynamicTest("Inventory Check Size Test ", () -> assertEquals(inventorySize,
                         petStore.getPetsForSale().size())),
                 dynamicTest("The cat objects match ", () -> assertEquals(sphynx.toString(),
                         removedItem.toString()))
-                );
-        nodes.add(dynamicContainer("Cat Item 2 Test", dynamicTests));//dynamicNode("", dynamicContainers);
-
+        );
+        nodes.add(dynamicContainer("Cat Item 2 Test", dynamicTests));
         return nodes.stream();
     }
 
-    /**
-     * Example of parameterized test
-     * @param number to be tested
-     */
     @ParameterizedTest
-    @ValueSource(ints = {2, 4, 6, -10, 128, Integer.MIN_VALUE}) // six numbers
+    @ValueSource(ints = {2, 4, 6, -10, 128, Integer.MIN_VALUE})
     void isNumberEven(int number)
     {
         assertTrue(Numbers.isEven(number));
     }
-@Test
-@org.junit.jupiter.api.DisplayName("Add new Bird increases inventory and is present")
-public void addNewBird_increasesInventory_andIsPresent() {
-    int start = petStore.getPetsForSale().size();
 
-    Bird robin = new Bird(
-            animals.AnimalType.DOMESTIC,
-            Skin.UNKNOWN,
-            Gender.FEMALE,
-            Breed.ROBIN,
-            new java.math.BigDecimal("79.00"),
-            99 // id not used by init inventory
-    );
+    @Test
+    @DisplayName("Add new Bird increases inventory and is present")
+    public void addNewBird_increasesInventory_andIsPresent() {
+        int start = petStore.getPetsForSale().size();
 
-    petStore.addPetInventoryItem(robin);
+        Bird robin = new Bird(
+                AnimalType.DOMESTIC,
+                Skin.UNKNOWN,
+                Gender.FEMALE,
+                Breed.ROBIN,
+                new BigDecimal("79.00"),
+                99
+        );
 
-    assertEquals(start + 1, petStore.getPetsForSale().size(), "Inventory should increase by 1");
-    assertTrue(petStore.getPetsForSale().contains(robin), "New bird should be present");
-}
+        petStore.addPetInventoryItem(robin);
 
-@Test
-@org.junit.jupiter.api.DisplayName("Sell Bird removes only matching store id (leaves the other)")
-public void sellRemovesOnlyMatchingId_bird()
-        throws animals.petstore.store.DuplicatePetStoreRecordException,
-               animals.petstore.store.PetNotFoundSaleException {
+        assertEquals(start + 1, petStore.getPetsForSale().size(), "Inventory should increase by 1");
+        assertTrue(petStore.getPetsForSale().contains(robin), "New bird should be present");
+    }
 
-    Bird b1 = new Bird(animals.AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
-            Breed.CARDINAL, new java.math.BigDecimal("50.00"), 300);
-    Bird b2 = new Bird(animals.AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
-            Breed.CARDINAL, new java.math.BigDecimal("50.00"), 301);
+    @Test
+    @DisplayName("Sell Bird removes only matching store id (leaves the other)")
+    public void sellRemovesOnlyMatchingId_bird()
+            throws DuplicatePetStoreRecordException,
+            PetNotFoundSaleException {
 
-    petStore.addPetInventoryItem(b1);
-    petStore.addPetInventoryItem(b2);
-    int before = petStore.getPetsForSale().size();
+        Bird b1 = new Bird(
+                AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
+                Breed.CARDINAL, new BigDecimal("50.00"), 300);
 
-    Bird removed = (Bird) petStore.soldPetItem(
-            new Bird(animals.AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
-                    Breed.CARDINAL, new java.math.BigDecimal("50.00"), 300));
+        Bird b2 = new Bird(
+                AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
+                Breed.CARDINAL, new BigDecimal("50.00"), 301);
 
-    assertEquals(before - 1, petStore.getPetsForSale().size(), "Only one bird should be removed");
-    assertEquals(300, removed.getPetStoreId());
-    assertTrue(petStore.getPetsForSale().contains(b2), "Bird with id 301 should still remain");
-}
+        petStore.addPetInventoryItem(b1);
+        petStore.addPetInventoryItem(b2);
+
+        int before = petStore.getPetsForSale().size();
+
+        Bird removed = (Bird) petStore.soldPetItem(
+                new Bird(
+                        AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
+                        Breed.CARDINAL, new BigDecimal("50.00"), 300));
+
+        assertEquals(before - 1, petStore.getPetsForSale().size(), "Only one bird should be removed");
+        assertEquals(300, removed.getPetStoreId());
+        assertTrue(petStore.getPetsForSale().contains(b2), "Bird with id 301 should still remain");
+    }
 }
