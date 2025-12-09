@@ -129,5 +129,47 @@ public class PetStoreTest
     {
         assertTrue(Numbers.isEven(number));
     }
+@Test
+@org.junit.jupiter.api.DisplayName("Add new Bird increases inventory and is present")
+public void addNewBird_increasesInventory_andIsPresent() {
+    int start = petStore.getPetsForSale().size();
 
+    Bird robin = new Bird(
+            animals.AnimalType.DOMESTIC,
+            Skin.UNKNOWN,
+            Gender.FEMALE,
+            Breed.ROBIN,
+            new java.math.BigDecimal("79.00"),
+            99 // id not used by init inventory
+    );
+
+    petStore.addPetInventoryItem(robin);
+
+    assertEquals(start + 1, petStore.getPetsForSale().size(), "Inventory should increase by 1");
+    assertTrue(petStore.getPetsForSale().contains(robin), "New bird should be present");
+}
+
+@Test
+@org.junit.jupiter.api.DisplayName("Sell Bird removes only matching store id (leaves the other)")
+public void sellRemovesOnlyMatchingId_bird()
+        throws animals.petstore.store.DuplicatePetStoreRecordException,
+               animals.petstore.store.PetNotFoundSaleException {
+
+    Bird b1 = new Bird(animals.AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
+            Breed.CARDINAL, new java.math.BigDecimal("50.00"), 300);
+    Bird b2 = new Bird(animals.AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
+            Breed.CARDINAL, new java.math.BigDecimal("50.00"), 301);
+
+    petStore.addPetInventoryItem(b1);
+    petStore.addPetInventoryItem(b2);
+    int before = petStore.getPetsForSale().size();
+
+    Bird removed = (Bird) petStore.soldPetItem(
+            new Bird(animals.AnimalType.DOMESTIC, Skin.UNKNOWN, Gender.MALE,
+                    Breed.CARDINAL, new java.math.BigDecimal("50.00"), 300));
+
+    assertEquals(before - 1, petStore.getPetsForSale().size(), "Only one bird should be removed");
+    assertEquals(300, removed.getPetStoreId());
+    assertTrue(petStore.getPetsForSale().contains(b2), "Bird with id 301 should still remain");
+}
 }
