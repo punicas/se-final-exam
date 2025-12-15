@@ -9,58 +9,66 @@ import animals.petstore.pet.attributes.Skin;
 
 import java.math.BigDecimal;
 
+/**
+ * Bird pet type
+ */
 public class Bird extends Pet implements PetImpl {
 
-    /* Properties */
     private int numberOfLegs;
     private Breed breed;
 
-    /**
-     * Constructor
-     */
-    public Bird(AnimalType animalType,
-                Skin skinType,
-                Gender gender,
-                Breed breed)
-    {
-        this(animalType, skinType, gender, breed, new BigDecimal(0));
+    /* ===== Constructors ===== */
+
+    public Bird(AnimalType animalType, Skin skinType, Gender gender, Breed breed) {
+        this(animalType, skinType, gender, breed, BigDecimal.ZERO);
     }
 
-    /**
-     * Constructor
-     */
-    public Bird(AnimalType animalType,
-                Skin skinType,
-                Gender gender,
-                Breed breed,
-                BigDecimal cost)
-    {
+    public Bird(AnimalType animalType, Skin skinType, Gender gender, Breed breed, BigDecimal cost) {
         this(animalType, skinType, gender, breed, cost, 0);
     }
 
-    /**
-     * Constructor (MAIN)
-     */
     public Bird(AnimalType animalType,
                 Skin skinType,
                 Gender gender,
                 Breed breed,
                 BigDecimal cost,
-                int petStoreId)
-    {
+                int petStoreId) {
+
         super(PetType.BIRD, cost, gender, petStoreId);
-        super.skinType = skinType;
         super.animalType = animalType;
-        this.numberOfLegs = 2;     // Birds have 2 legs
+        super.skinType = skinType;
+
         this.breed = breed;
+        this.numberOfLegs = 2;
+        this.hasLegs = true;
+        this.isMammal = false;
     }
 
-    /** Bird hypoallergenic check (optional like Dog/Cat) */
+    /* ===== Getters used by tests ===== */
+
+    public AnimalType getAnimalType() {
+        return this.animalType;
+    }
+
+    public Skin getSkinType() {
+        return this.skinType;
+    }
+
+    @Override
+    public Breed getBreed() {
+        return this.breed;
+    }
+
+    public int getNumberOfLegs() {
+        return numberOfLegs;
+    }
+
+    /* ===== Behavior ===== */
+
     public String birdHypoallergenic() {
-        return super.petHypoallergenic(this.skinType).replaceAll("pet", "bird");
+        return super.petHypoallergenic(this.skinType).replace("pet", "bird");
     }
 
-    /** Bird speak method (mirrors Cat & Dog pattern) */
     public String speak() {
         switch (this.animalType) {
             case DOMESTIC:
@@ -72,31 +80,17 @@ public class Bird extends Pet implements PetImpl {
         }
     }
 
-    public int getNumberOfLegs() {
-        return numberOfLegs;
-    }
-
-    public void setNumberOfLegs(int numberOfLegs) {
-        this.numberOfLegs = numberOfLegs;
-    }
-
-    /** Required by PetImpl */
-    @Override
-    public Breed getBreed() {
-        return this.breed;
-    }
-
-    public AnimalType getAnimalType() {
-        return this.animalType;
+    private String numberOfLegsAsString() {
+        return "Birds have " + numberOfLegs + " legs!";
     }
 
     @Override
     public String toString() {
-        return super.toString() +
-                "The bird is " + this.animalType + "!\n" +
-                "The bird breed is " + this.getBreed() + "!\n" +
-                this.birdHypoallergenic() + "!\n" +
-                this.speak() + "\n" +
-                "Birds have " + this.numberOfLegs + " legs!";
+        return super.toString()
+                + "The bird is " + this.animalType + "!\n"
+                + "The bird breed is " + this.breed + "!\n"
+                + this.birdHypoallergenic() + "!\n"
+                + this.speak() + "\n"
+                + numberOfLegsAsString();
     }
 }
